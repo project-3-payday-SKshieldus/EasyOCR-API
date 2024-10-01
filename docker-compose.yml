@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  ocr-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.ocr
+    volumes:
+      - /app/EasyOCR  # EasyOCR 폴더 마운트 / 여기 경로 수정해줘야함(마운트용)
+    networks:
+      - flask-api
+    ports:
+      - "5000:5000"
+
+  process-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.process
+    volumes:
+      - /app/process.py  # process.py 파일 마운트 / 여기 경로 수정해줘야함(마운트용)
+    networks:
+      - flask-api
+    ports:
+      - "5001:5001"
+
+  geo-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.geo
+    volumes:
+      - /app  # geo_api 폴더 마운트 / 여기 경로 수정해줘야함(마운트용)
+    networks:
+      - flask-api
+    ports:
+      - "5002:5002"
+
+networks:
+  flask-api:
+    driver: bridge

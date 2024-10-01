@@ -1,0 +1,36 @@
+# Python 3.10 기반 이미지
+FROM python:3.10.14-slim
+
+# 작업 디렉토리 설정
+WORKDIR /app
+
+# 패키지 설치에 필요한 시스템 패키지 설치
+RUN apt-get update -y && \
+    apt-get install -y \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgl1-mesa-dev \
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# EasyOCR 및 기타 Python 패키지 설치
+RUN pip install --no-cache-dir \
+    torch==2.0.1+cu117 \
+    torchvision==0.15.2+cu117 \
+    torchaudio==2.0.2+cu117 \
+    --index-url https://download.pytorch.org/whl/cu117 \
+    typing_extensions \
+    urllib3==1.26.13
+
+# requirements.txt에 있는 패키지 설치
+COPY ocrrequirements.txt /app/
+RUN pip install --no-cache-dir -r ocrrequirements.txt
+
+# EasyOCR 폴더 및 OCRrun.py 파일 복사
+COPY EasyOCR /app/EasyOCR
+COPY EasyOCR/OCRrun.py /app/OCRrun.py
+
+# Flask 애플리케이션 실행
+CMD ["python", "OCRrun.py"]
